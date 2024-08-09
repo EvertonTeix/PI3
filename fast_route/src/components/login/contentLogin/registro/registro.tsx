@@ -9,9 +9,7 @@ export function Registro() {
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [errorMessage, setErrorMessage] = useState<string>('');
-
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +51,47 @@ export function Registro() {
 
     const isFormValid = () => {
         return username.trim() !== '' && email.trim() !== '' && password !== '' && password === confirmPassword;
+    };
+
+    const handleSubmit = async () => {
+        if (!isFormValid()) {
+            setErrorMessage('Por favor, preencha todos os campos corretamente.');
+            return;
+        }
+
+        const usuario = {
+            nome_usuario: username,
+            email: email,
+            senha: password,
+            foto: selectedImage ? selectedImage.split(',')[1] : null, // Extrair a parte base64 da URL
+            permissao: 0
+        };
+
+        try {
+            const response = await fetch('https://localhost:7104/Usuarios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(usuario)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                setErrorMessage(`Erro ao cadastrar usuário: ${errorData.message || 'Erro desconhecido'}`);
+            } else {
+                setUsername('');
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+                setSelectedImage(null);
+                setErrorMessage('');
+                alert('Usuário cadastrado com sucesso!');
+            }
+        } catch (error) {
+            setErrorMessage('Erro ao se conectar com o servidor. Verifique o console para mais detalhes.');
+            console.error('Detalhes do erro:', error); // Ajuda na depuração
+        }
     };
 
     return (
@@ -120,7 +159,14 @@ export function Registro() {
                         </label>
                         {errorMessage && <div className="error-message">{errorMessage}</div>}
                     </div>
-                    {isFormValid() && <button className="cadastrar">Cadastrar</button>}
+                    {isFormValid() && (
+                        <button
+                            className="cadastrar"
+                            onClick={handleSubmit}
+                        >
+                            Cadastrar
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

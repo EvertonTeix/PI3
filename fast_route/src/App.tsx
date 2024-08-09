@@ -9,7 +9,7 @@ import { MenuLogin } from './components/login/menuLogin/menuLogin';
 
 function App() {
   // const [numero, setNumero] = useState(0);
-  const [valor, setValor] = useState(0);
+  const [valor, setValor] = useState(2);
   // const handleNumeroChange = (value: number) => {
   //   console.log(value);
   //   setNumero(value);
